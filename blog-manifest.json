@@ -1,0 +1,12 @@
+{
+  "articles": [
+    "interesting-article.md"
+  ],
+  "books": [
+    "another-book.md",
+    "first-read.md"
+  ],
+  "daily-reads": [
+    "2024-01-15.md"
+  ]
+}

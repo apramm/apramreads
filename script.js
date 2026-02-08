@@ -1,16 +1,17 @@
-// Configuration: Define your blog sections and their markdown files here
-const BLOG_CONFIG = {
-    'books': [
-        'first-read.md',
-        'another-book.md'
-    ],
-    'articles': [
-        'interesting-article.md'
-    ],
-    'daily-reads': [
-        '2024-01-15.md'
-    ]
-};
+// Function to load blog manifest (auto-generated list of markdown files)
+async function loadBlogManifest() {
+    try {
+        const response = await fetch('blog-manifest.json');
+        if (!response.ok) {
+            console.warn('Could not load blog-manifest.json, using empty config');
+            return {};
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error loading blog manifest:', error);
+        return {};
+    }
+}
 
 // Function to extract title from markdown content
 function extractTitle(markdown) {
@@ -69,6 +70,9 @@ async function fetchPost(section, filename) {
 async function renderBlogList() {
     const blogList = document.getElementById('blog-list');
     
+    // Load the blog manifest
+    const BLOG_CONFIG = await loadBlogManifest();
+    
     // Fetch all posts
     const allPosts = [];
     for (const [section, files] of Object.entries(BLOG_CONFIG)) {
@@ -85,7 +89,7 @@ async function renderBlogList() {
             <div class="empty-state">
                 <h2>No posts yet</h2>
                 <p>Add markdown files to the blog folders to get started.</p>
-                <p>Edit the <code>BLOG_CONFIG</code> in <code>script.js</code> to register your posts.</p>
+                <p>Run <code>node generate-manifest.js</code> to update the blog manifest.</p>
             </div>
         `;
         return;
@@ -113,17 +117,23 @@ async function renderBlogList() {
     // Render sections and posts
     let html = '';
     for (const [section, posts] of Object.entries(postsBySection)) {
+        const sectionId = section.replace(/\s+/g, '-').toLowerCase();
         html += `
             <section class="section">
-                <h2 class="section-title">${section.charAt(0).toUpperCase() + section.slice(1).replace('-', ' ')}</h2>
-                <ul class="post-list">
+                <h2 class="section-title collapsible" data-section="${sectionId}">
+                    <span class="collapse-icon">▼</span>
+                    ${section.charAt(0).toUpperCase() + section.slice(1).replace('-', ' ')}
+                </h2>
+                <ul class="post-list" id="section-${sectionId}">
         `;
         
         posts.forEach(post => {
             html += `
                 <li class="post-item">
-                    <h3 class="post-title"><a href="${post.url}">${post.title}</a></h3>
-                    ${post.date ? `<p class="post-date">${post.date}</p>` : ''}
+                    <a href="${post.url}" class="post-link">
+                        <span class="post-title">${post.title}</span>
+                        ${post.date ? `<span class="post-date">${post.date}</span>` : ''}
+                    </a>
                 </li>
             `;
         });
@@ -135,7 +145,27 @@ async function renderBlogList() {
     }
     
     blogList.innerHTML = html;
+    
+    // Add event listeners for collapsible sections
+    document.querySelectorAll('.section-title.collapsible').forEach(title => {
+        title.addEventListener('click', function() {
+            const sectionId = this.getAttribute('data-section');
+            const postList = document.getElementById(`section-${sectionId}`);
+            const icon = this.querySelector('.collapse-icon');
+            
+            if (postList.style.display === 'none') {
+                postList.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                postList.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        });
+    });
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', renderBlogList);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
+    renderBlogList();
+});

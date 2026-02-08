@@ -57,4 +57,7 @@ async function loadPost() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', loadPost);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
+    loadPost();
+});
