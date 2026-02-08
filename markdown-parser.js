@@ -38,23 +38,22 @@ function parseMarkdown(markdown) {
     // Links
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
     
-    // Unordered lists
-    html = html.replace(/^\- (.*$)/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    // Mark unordered list items
+    html = html.replace(/^\- (.*$)/gm, '<UL_LI>$1</UL_LI>');
     
-    // Ordered lists
-    html = html.replace(/^\d+\. (.*$)/gm, '<li>$1</li>');
+    // Mark ordered list items
+    html = html.replace(/^\d+\. (.*$)/gm, '<OL_LI>$1</OL_LI>');
     
     // Horizontal rule
     html = html.replace(/^---$/gm, '<hr>');
     
     // Line breaks and paragraphs
     const lines = html.split('\n');
-    let inList = false;
-    let inBlockquote = false;
     let inCodeBlock = false;
     let result = [];
     let paragraph = [];
+    let ulItems = [];
+    let olItems = [];
     
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -74,45 +73,116 @@ function parseMarkdown(markdown) {
                 result.push('<p>' + paragraph.join(' ') + '</p>');
                 paragraph = [];
             }
+            // Flush any pending lists
+            if (ulItems.length > 0) {
+                result.push('<ul>');
+                ulItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ul>');
+                ulItems = [];
+            }
+            if (olItems.length > 0) {
+                result.push('<ol>');
+                olItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ol>');
+                olItems = [];
+            }
             result.push(line);
             continue;
         }
         
-        // Handle special elements
-        if (trimmed.startsWith('<h') || trimmed.startsWith('<hr') || 
-            trimmed.startsWith('<ul>') || trimmed.startsWith('<ol>') ||
-            trimmed.startsWith('</ul>') || trimmed.startsWith('</ol>') ||
-            trimmed.startsWith('<blockquote>')) {
+        // Handle unordered list items
+        if (trimmed.startsWith('<UL_LI>')) {
+            if (paragraph.length > 0) {
+                result.push('<p>' + paragraph.join(' ') + '</p>');
+                paragraph = [];
+            }
+            // Flush ordered list if switching to unordered
+            if (olItems.length > 0) {
+                result.push('<ol>');
+                olItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ol>');
+                olItems = [];
+            }
+            const content = trimmed.replace('<UL_LI>', '').replace('</UL_LI>', '');
+            ulItems.push(content);
+            
+        // Handle ordered list items
+        } else if (trimmed.startsWith('<OL_LI>')) {
+            if (paragraph.length > 0) {
+                result.push('<p>' + paragraph.join(' ') + '</p>');
+                paragraph = [];
+            }
+            // Flush unordered list if switching to ordered
+            if (ulItems.length > 0) {
+                result.push('<ul>');
+                ulItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ul>');
+                ulItems = [];
+            }
+            const content = trimmed.replace('<OL_LI>', '').replace('</OL_LI>', '');
+            olItems.push(content);
+            
+        // Handle special elements (headers, hr, blockquote)
+        } else if (trimmed.startsWith('<h') || trimmed.startsWith('<hr') || 
+                   trimmed.startsWith('<blockquote>')) {
             
             if (paragraph.length > 0) {
                 result.push('<p>' + paragraph.join(' ') + '</p>');
                 paragraph = [];
             }
-            result.push(line);
-            
-        } else if (trimmed.startsWith('<li>')) {
-            if (!inList && paragraph.length > 0) {
-                result.push('<p>' + paragraph.join(' ') + '</p>');
-                paragraph = [];
+            // Flush any pending lists
+            if (ulItems.length > 0) {
+                result.push('<ul>');
+                ulItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ul>');
+                ulItems = [];
             }
-            inList = true;
+            if (olItems.length > 0) {
+                result.push('<ol>');
+                olItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ol>');
+                olItems = [];
+            }
             result.push(line);
             
+        // Handle empty lines
         } else if (trimmed === '') {
             if (paragraph.length > 0) {
                 result.push('<p>' + paragraph.join(' ') + '</p>');
                 paragraph = [];
             }
-            inList = false;
+            // Flush any pending lists on empty line
+            if (ulItems.length > 0) {
+                result.push('<ul>');
+                ulItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ul>');
+                ulItems = [];
+            }
+            if (olItems.length > 0) {
+                result.push('<ol>');
+                olItems.forEach(item => result.push('<li>' + item + '</li>'));
+                result.push('</ol>');
+                olItems = [];
+            }
             
         } else {
             paragraph.push(line);
         }
     }
     
-    // Handle any remaining paragraph
+    // Handle any remaining content
     if (paragraph.length > 0) {
         result.push('<p>' + paragraph.join(' ') + '</p>');
+    }
+    if (ulItems.length > 0) {
+        result.push('<ul>');
+        ulItems.forEach(item => result.push('<li>' + item + '</li>'));
+        result.push('</ul>');
+    }
+    if (olItems.length > 0) {
+        result.push('<ol>');
+        olItems.forEach(item => result.push('<li>' + item + '</li>'));
+        result.push('</ol>');
     }
     
     return result.join('\n');
