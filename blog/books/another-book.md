@@ -1,17 +1,11 @@
-# Another Interesting Book
+# Introduction to Compiler Construction
 
-date: 2024-01-20
+date: 2026-02-08
 
-This book took a different approach to storytelling and I found it fascinating.
+This book is interesting to understanding how logic/program works between different source and target languages in a compiler
 
 ## Key Takeaways
 
-1. Different perspectives matter
-2. Context is everything
-3. Never stop questioning
-
-The author's writing style was engaging and kept me hooked from start to finish.
 
 ## Would I Recommend It?
 
-Absolutely! This is a must-read for anyone interested in expanding their worldview.
