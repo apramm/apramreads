@@ -1,12 +1,8 @@
 {
-  "articles": [
-    "interesting-article.md"
-  ],
   "books": [
-    "another-book.md",
-    "first-read.md"
+    "intro-to-compiler.md"
   ],
   "daily-reads": [
-    "2024-01-15.md"
+    "2026-02-08.md"
   ]
 }
