@@ -1,0 +1,16 @@
+{
+  "name": "apramreads",
+  "version": "1.0.0",
+  "description": "A simple static blog website to record what I read",
+  "scripts": {
+    "update-manifest": "node generate-manifest.js",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "blog",
+    "markdown",
+    "static-site"
+  ],
+  "author": "apramm",
+  "license": "MIT"
+}

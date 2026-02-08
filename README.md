@@ -6,9 +6,11 @@ A simple static blog website to record what I read (mainly for the 2 pages a day
 
 - 📝 Write blog posts in Markdown
 - 📁 Organize posts by sections (folders)
-- 🌙 Dark mode by default
+- 🌙 Dark mode and ☀️ Light mode with toggle
 - 📱 Responsive design
-- ✨ Clean, minimal styling
+- ✨ Clean, minimal list-based styling
+- 🗂️ Collapsible sections for better organization
+- 🤖 Automatic markdown file discovery
 
 ## How to Add a New Blog Post
 
@@ -26,20 +28,14 @@ A simple static blog website to record what I read (mainly for the 2 pages a day
    Your content here...
    ```
 
-3. **Register your post** in `script.js`:
-   - Open `script.js`
-   - Find the `BLOG_CONFIG` object
-   - Add your markdown filename to the appropriate section:
-   ```javascript
-   const BLOG_CONFIG = {
-       'books': [
-           'first-read.md',
-           'your-new-post.md'  // Add your file here
-       ],
-       'articles': [...],
-       'daily-reads': [...]
-   };
+3. **Generate the blog manifest** to automatically discover your new post:
+   ```bash
+   node generate-manifest.js
+   # Or using npm:
+   npm run update-manifest
    ```
+   
+   This will scan all markdown files in the `blog/` directory and update the `blog-manifest.json` file.
 
 4. **Commit and push** your changes to GitHub
 
@@ -49,15 +45,15 @@ To add a new blog section:
 
 1. Create a new folder in the `blog/` directory
 2. Add your markdown files to the new folder
-3. Update `BLOG_CONFIG` in `script.js` with the new section:
-   ```javascript
-   const BLOG_CONFIG = {
-       'books': [...],
-       'your-new-section': [
-           'your-post.md'
-       ]
-   };
-   ```
+3. Run `node generate-manifest.js` to update the manifest
+4. Your new section will automatically appear on the site!
+
+## Theme Toggle
+
+The site supports both dark and light modes:
+- Click the 🌙/☀️ button in the header to switch themes
+- Your preference is saved in browser localStorage
+- Theme persists across page navigation
 
 ## Local Development
 
