@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - 'blog/**/*.md'
+  workflow_dispatch:  # Allow manual triggering
+  schedule:
+    # Run daily at 00:00 UTC to catch any missed updates
+    - cron: '0 0 * * *'
 
 permissions:
   contents: write
@@ -18,7 +22,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0  # Fetch full history for reliable git operations
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main  # Explicitly checkout main branch
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,6 +37,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
+          git add -N blog-manifest.json  # Add untracked file to index for diff
           if git diff --quiet blog-manifest.json; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
@@ -44,4 +51,5 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add blog-manifest.json
           git commit -m "Auto-update blog manifest [skip ci]"
-          git push
+          git pull --rebase origin main  # Pull latest changes before pushing
+          git push origin main
