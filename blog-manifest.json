@@ -1,7 +1,8 @@
 {
   "books": [
     "algorithm-design.md",
-    "intro-to-compiler.md"
+    "intro-to-compiler.md",
+    "meditations.md"
   ],
   "daily-reads": [
     "2026-02-08.md",
