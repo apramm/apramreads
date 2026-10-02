@@ -1,30 +1,23 @@
-// Theme switching functionality
+// Theme switching functionality (light is the default; "dark" is the opt-in)
 function initializeTheme() {
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    // Apply saved theme
-    if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeToggle.textContent = '☀️';
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        themeToggle.textContent = '🌙';
-    }
-    
-    // Add click handler
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        
-        if (currentTheme === 'light') {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'dark');
+
+    const apply = (theme) => {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
             themeToggle.textContent = '🌙';
         } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
+            document.documentElement.removeAttribute('data-theme');
             themeToggle.textContent = '☀️';
         }
+    };
+
+    apply(localStorage.getItem('theme') || 'light');
+
+    themeToggle.addEventListener('click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
     });
 }
 

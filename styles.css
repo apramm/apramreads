@@ -1,6 +1,27 @@
+/* Fonts — same self-hosted files as apramahuja.com */
+@font-face { font-family: "Newsreader"; src: url("fonts/newsreader-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+/* Georgia scaled to Newsreader's metrics so the swap barely shifts layout */
+@font-face { font-family: "Newsreader Fallback"; src: local("Georgia"); size-adjust: 92%; ascent-override: 92%; descent-override: 26%; line-gap-override: 0%; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/geist-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+
 /* Color scheme variables */
 :root {
-    /* Dark mode colors (default) */
+    --serif: "Newsreader", "Newsreader Fallback", "Iowan Old Style", Georgia, serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* Light mode colors (default) — palette from apramahuja.com */
+    --bg-color: #FBFBF9;
+    --text-color: #151816;
+    --heading-color: #151816;
+    --link-color: #2F6B7A;
+    --link-hover-color: #245563;
+    --border-color: #E2E4DE;
+    --card-bg: #F2F3EF;
+    --code-bg: #EEF0EA;
+    color-scheme: light;
+}
+
+/* Dark mode colors */
+[data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
     --heading-color: #ffffff;
@@ -9,18 +30,7 @@
     --border-color: #333333;
     --card-bg: #252525;
     --code-bg: #2d2d2d;
-}
-
-/* Light mode colors */
-[data-theme="light"] {
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --heading-color: #1a1a1a;
-    --link-color: #0066cc;
-    --link-hover-color: #0052a3;
-    --border-color: #e0e0e0;
-    --card-bg: #f5f5f5;
-    --code-bg: #f0f0f0;
+    color-scheme: dark;
 }
 
 /* Reset and base styles */
@@ -31,8 +41,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
+    font: 400 1.0625rem/1.55 var(--serif);
     color: var(--text-color);
     background-color: var(--bg-color);
     padding: 20px;
@@ -45,6 +54,7 @@ body {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
     color: var(--heading-color);
     margin-top: 1.5em;
     margin-bottom: 0.5em;
@@ -142,9 +152,11 @@ main {
 }
 
 .section-title {
-    font-size: 1.8em;
-    color: var(--link-color);
-    margin-bottom: 15px;
+    font-size: 1.25rem;
+    color: var(--heading-color);
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 4px;
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -161,54 +173,26 @@ main {
     transition: transform 0.3s ease;
 }
 
+/* thume.ca-style archive rows: "21 Feb 2026 » Title" */
 .post-list {
     list-style: none;
+    margin-bottom: .5rem;
 }
 
 .post-item {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s ease;
-}
-
-.post-item:last-child {
-    border-bottom: none;
-}
-
-.post-item:hover {
-    background-color: var(--card-bg);
-    padding-left: 10px;
-}
-
-.post-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
-    gap: 15px;
-}
-
-.post-link:hover {
-    text-decoration: none;
-}
-
-.post-title {
-    color: var(--link-color);
-    font-size: 1.1em;
-    flex-grow: 1;
-}
-
-.post-link:hover .post-title {
-    color: var(--link-hover-color);
-    text-decoration: underline;
+    padding: 2px 0;
 }
 
 .post-date {
     color: #888;
-    font-size: 0.9em;
     white-space: nowrap;
-    font-style: italic;
+    font-family: var(--mono);
+    font-size: .8125rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.post-date::after {
+    content: " »";
 }
 
 /* Post content */
@@ -234,7 +218,7 @@ article code {
     background-color: var(--code-bg);
     padding: 2px 6px;
     border-radius: 3px;
-    font-family: 'Courier New', Courier, monospace;
+    font: .875em var(--mono);
 }
 
 article pre code {
@@ -261,6 +245,8 @@ article li {
 
 /* Breadcrumb navigation */
 .breadcrumb {
+    font-family: var(--mono);
+    font-size: .8125rem;
     margin-bottom: 30px;
     color: #888;
 }
@@ -361,7 +347,4 @@ footer {
         font-size: 1.5em;
     }
 
-    .post-item {
-        padding: 15px;
-    }
 }

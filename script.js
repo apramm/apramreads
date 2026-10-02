@@ -1,3 +1,7 @@
+// 2026-02-21 -> "21 Feb 2026" (fixed 3-letter months so the column lines up; locales give "Sept")
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const formatDate = iso => { const [y, m, d] = iso.split('-'); return `${d} ${MONTHS[m - 1]} ${y}`; };
+
 // Function to load blog manifest (auto-generated list of markdown files)
 async function loadBlogManifest() {
     try {
@@ -32,8 +36,8 @@ function extractDate(filename, markdown) {
         return dateMatch[1];
     }
     
-    // Try to extract date from markdown front matter or content
-    const dateLineMatch = markdown.match(/date:\s*(\d{4}-\d{2}-\d{2})/i);
+    // Otherwise the first ISO date in the content (books: "started reading on: YYYY-MM-DD")
+    const dateLineMatch = markdown.match(/(\d{4}-\d{2}-\d{2})/);
     if (dateLineMatch) {
         return dateLineMatch[1];
     }
@@ -130,10 +134,8 @@ async function renderBlogList() {
         posts.forEach(post => {
             html += `
                 <li class="post-item">
-                    <a href="${post.url}" class="post-link">
-                        <span class="post-title">${post.title}</span>
-                        ${post.date ? `<span class="post-date">${post.date}</span>` : ''}
-                    </a>
+                    ${post.date ? `<span class="post-date">${formatDate(post.date)}</span>` : ''}
+                    <a href="${post.url}" class="post-link">${post.title}</a>
                 </li>
             `;
         });
